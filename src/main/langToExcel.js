@@ -99,17 +99,16 @@ const toJs = (url, filepath, fileName) => {
   return new Promise((resolve, reject) => {
     let code
     try {
-      let res = fs.readFileSync(url.replace('/', path.sep), 'utf-8')
+      let res = fs.readFileSync(url.replace('/', path.sep))
       const data = xlsx.parse(res)[0].data // 第一个sheet
       data.shift() // 去除第一行，第一行是标题
-      console.log(data)
       const jsonData = arrayToObject(data)
       code = `export default ${JSON.stringify(jsonData, '', 2).replace(/\"/g, "'")}\r\n`
       fs.access(path.join(filepath, fileName), fs.constants.F_OK, err => {
         if (!err) {
-          fs.unlinkSync(path.join(filepath, fileName))
+          fs.unlinkSync(filepath + path.sep + fileName)
         }
-        fs.writeFile(path.join(filepath, fileName), code, { flag: 'w' })
+        fs.writeFileSync(filepath + path.sep + fileName, code, { flag: 'w' })
         resolve({
           data: path.join(filepath, fileName)
         })
